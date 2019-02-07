@@ -14,7 +14,20 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo
+          image: mongo:4.1.7
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: secrecy
+                  key: mongo_user
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrecy
+                  key: mongo_password
+            - name: MONGO_INITDB_DATABASE
+              value: "guidking"
           ports:
             - name: mongo-port
               containerPort: 27017

@@ -1,40 +1,28 @@
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "guidking.deployment.fullname" . -}}
-{{- $ingressPaths := .Values.ingress.paths -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
-  labels:
-    app.kubernetes.io/name: {{ include "guidking.deployment.name" . }}
-    helm.sh/chart: {{ include "guidking.deployment.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- with .Values.ingress.annotations }}
+  name: ingress
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 spec:
-{{- if .Values.ingress.tls }}
   tls:
-  {{- range .Values.ingress.tls }}
     - hosts:
-      {{- range .hosts }}
-        - {{ . | quote }}
-      {{- end }}
-      secretName: {{ .secretName }}
-  {{- end }}
-{{- end }}
+        - guidking.com
+        - api.guidking.com
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . | quote }}
-      http:
-        paths:
-	{{- range $ingressPaths }}
-          - path: {{ . }}
-            backend:
-              serviceName: {{ $fullName }}
-              servicePort: http
-	{{- end }}
-  {{- end }}
-{{- end }}
+  - host: guidking.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: guidking-com-service
+          servicePort: 80
+  - host: api.guidking.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: guidking-api-service
+          servicePort: 3000

@@ -19,6 +19,11 @@ spec:
           env:
             - name: MONGO_HOST
               value: mongo-service
+            - name: MONGO_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: secrecy
+                  key: mongo_password
           ports:
             - name: http
               containerPort: 3000
